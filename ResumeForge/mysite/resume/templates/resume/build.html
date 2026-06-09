@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+{% block title %}Build Resume — ResumeForge{% endblock %}
+{% block extra_head %}
+<style>
+*{box-sizing:border-box;}
+.builder-wrap{display:grid;grid-template-columns:260px 1fr 380px;min-height:calc(100vh - 68px);margin-top:68px;}
+.builder-sidebar{background:white;border-right:1px solid var(--border);padding:1.5rem 1rem;position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto;}
+.sidebar-logo{font-size:1rem;color:var(--green-dark);margin-bottom:1.5rem;padding:0 0.5rem;font-weight:800;}
+.sidebar-logo em{color:var(--green);font-style:normal;}
+.step-list{list-style:none;}
+.step-item{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;border-radius:10px;cursor:pointer;margin-bottom:2px;transition:all .2s;font-size:0.82rem;font-weight:500;color:var(--gray);}
+.step-item:hover{background:var(--green-soft);color:var(--green);}
+.step-item.active{background:var(--green-soft);color:var(--green);font-weight:700;}
+.step-item.done .step-num{background:var(--green);color:white;}
+.step-num{width:20px;height:20px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-item.active .step-num{background:var(--green);color:white;}
+.template-section{margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);}
+.template-section h4{font-size:0.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.6rem;padding:0 0.4rem;}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;padding:0 0.2rem;}
+.tpl-btn{padding:0.45rem 0.2rem;border-radius:8px;border:2px solid var(--border);background:white;font-size:0.7rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--gray);transition:all .2s;text-align:center;}
+.tpl-btn:hover{border-color:var(--green);color:var(--green);}
+.tpl-btn.active{border-color:var(--green);background:var(--green-soft);color:var(--green);}
+.builder-form{padding:2rem;overflow-y:auto;height:calc(100vh - 68px);background:#f8fffe;}
+.form-section{display:none;}
+.form-section.active{display:block;}
+.section-header{margin-bottom:1.6rem;}
+.section-header h2{font-size:1.4rem;color:var(--green-dark);font-weight:800;}
+.section-header p{color:var(--gray);font-size:0.85rem;margin-top:0.3rem;}
+.fg{margin-bottom:1rem;}
+.fg label{display:block;font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;}
+.fg input,.fg textarea,.fg select{width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.85rem;background:white;color:var(--text);transition:border-color .2s,box-shadow .2s;outline:none;resize:vertical;}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.1);}
+.fg textarea{min-height:85px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7rem;}
+.dynamic-section{background:white;border:1.5px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:1rem;}
+.ds-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.ds-header h4{font-weight:700;font-size:0.88rem;color:var(--text);}
+.btn-remove{background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.78rem;padding:0.3rem 0.6rem;border-radius:6px;font-family:inherit;}
+.btn-remove:hover{background:#fef2f2;}
+.btn-add{display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border:2px dashed var(--green);background:transparent;color:var(--green);border-radius:10px;cursor:pointer;font-family:inherit;font-size:0.82rem;font-weight:600;width:100%;justify-content:center;transition:all .2s;margin-bottom:0.5rem;}
+.btn-add:hover{background:var(--green-soft);}
+.nav-btns{display:flex;gap:1rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;}
+.photo-upload-area{border:2px dashed var(--border);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;}
+.photo-upload-area:hover{border-color:var(--green);background:var(--green-soft);}
+.save-indicator{font-size:0.76rem;color:var(--gray);display:flex;align-items:center;gap:0.4rem;margin-top:0.4rem;}
+.save-indicator.saving{color:var(--green);}
+.skills-container{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;min-height:32px;padding:0.4rem;border:1.5px solid var(--border);border-radius:10px;background:white;}
+.skill-tag{display:flex;align-items:center;gap:0.35rem;background:var(--green-soft);color:var(--green);padding:0.25rem 0.65rem;border-radius:20px;font-size:0.8rem;font-weight:600;}
+.skill-tag button{background:none;border:none;color:inherit;cursor:pointer;font-size:0.9rem;line-height:1;}
+.skill-input-row{display:flex;gap:0.5rem;}
+.skill-input-row input{flex:1;}
+/* Preview panel */
+.builder-preview{background:#e8f5e9;border-left:1px solid var(--border);overflow-y:auto;height:calc(100vh - 68px);}
+.preview-toolbar{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 1rem;background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+.preview-toolbar span{font-size:0.8rem;font-weight:600;color:var(--gray);}
+.preview-toolbar .toolbar-actions{display:flex;gap:0.4rem;}
+.preview-frame-wrap{padding:1rem;display:flex;justify-content:center;}
+/* Mini resume for preview — mirrors resume_css.html but scaled */
+.resume-doc{background:white;width:210mm;min-height:297mm;box-shadow:0 4px 32px rgba(0,0,0,.12);font-size:10pt;font-family:'DM Sans','Inter',sans-serif;color:#1a1a1a;position:relative;}
+.tpl-modern .res-header,.tpl-bold .res-body .res-left,.tpl-creative .res-header,.tpl-elegant .res-header{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@media(max-width:1100px){.builder-preview{display:none;}.builder-wrap{grid-template-columns:220px 1fr;}}
+@media(max-width:780px){.builder-wrap{grid-template-columns:1fr;}.builder-sidebar{display:none;}.builder-form{height:auto;overflow:visible;}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="builder-wrap" id="builderWrap">
+  <!-- SIDEBAR -->
+  <aside class="builder-sidebar">
+    <div class="sidebar-logo">Resume<em>Forge</em></div>
+    <ul class="step-list" id="stepList">
+      <li class="step-item active" data-step="0"  onclick="goStep(0)"><div class="step-num">1</div>  Personal Info</li>
+      <li class="step-item"        data-step="1"  onclick="goStep(1)"><div class="step-num">2</div>  Education</li>
+      <li class="step-item"        data-step="2"  onclick="goStep(2)"><div class="step-num">3</div>  Experience</li>
+      <li class="step-item"        data-step="3"  onclick="goStep(3)"><div class="step-num">4</div>  Skills</li>
+      <li class="step-item"        data-step="4"  onclick="goStep(4)"><div class="step-num">5</div>  Projects</li>
+      <li class="step-item"        data-step="5"  onclick="goStep(5)"><div class="step-num">6</div>  Certifications</li>
+      <li class="step-item"        data-step="6"  onclick="goStep(6)"><div class="step-num">7</div>  Languages</li>
+      <li class="step-item"        data-step="7"  onclick="goStep(7)"><div class="step-num">8</div>  Achievements</li>
+      <li class="step-item"        data-step="8"  onclick="goStep(8)"><div class="step-num">9</div>  Coursework</li>
+      <li class="step-item"        data-step="9"  onclick="goStep(9)"><div class="step-num">10</div> Volunteer</li>
+      <li class="step-item"        data-step="10" onclick="goStep(10)"><div class="step-num">11</div> Activities</li>
+      <li class="step-item"        data-step="11" onclick="goStep(11)"><div class="step-num">12</div> Hobbies</li>
+      <li class="step-item"        data-step="12" onclick="goStep(12)"><div class="step-num">13</div> References</li>
+      <li class="step-item"        data-step="13" onclick="goStep(13)"><div class="step-num">14</div> Social Links</li>
+    </ul>
+    <div class="template-section">
+      <h4>Template</h4>
+      <div class="tpl-grid">
+        <button class="tpl-btn active" onclick="setTemplate('modern')">Modern</button>
+        <button class="tpl-btn" onclick="setTemplate('minimal')">Minimal</button>
+        <button class="tpl-btn" onclick="setTemplate('corporate')">Corporate</button>
+        <button class="tpl-btn" onclick="setTemplate('creative')">Creative</button>
+        <button class="tpl-btn" onclick="setTemplate('bold')">Bold Dark</button>
+        <button class="tpl-btn" onclick="setTemplate('elegant')">Elegant</button>
+      </div>
+    </div>
+    <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:0.5rem;">
+      <a href="{% url 'preview_resume' resume.pk %}" target="_blank" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;border-radius:10px;display:flex;"><i class="fa-solid fa-eye"></i> Preview</a>
+      <a href="{% url 'download_pdf' resume.pk %}" target="_blank" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;border-radius:10px;display:flex;"><i class="fa-solid fa-download"></i> Download PDF</a>
+    </div>
+  </aside>
+
+  <!-- FORM -->
+  <div class="builder-form" id="builderForm">
+
+    <!-- Step 0: Personal Info -->
+    <div class="form-section active" id="step-0">
+      <div class="section-header"><h2>Personal Information</h2><p>Your name, contact details and summary</p></div>
+      <div class="fg"><label>Resume Title</label><input type="text" id="resumeTitle" placeholder="e.g. Software Engineer Resume" value="{{ resume.title }}"></div>
+      <div class="fg">
+        <label>Profile Photo <span style="font-weight:400;color:var(--gray);">(optional)</span></label>
+        <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+          {% if resume.photo %}<img id="photoPreview" src="{{ resume.photo.url }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:0.5rem;">
+          {% else %}<div id="uploadIcon" style="font-size:2.2rem;color:#d1fae5;margin-bottom:0.5rem;"><i class="fa-solid fa-camera"></i></div>
+          <img id="photoPreview" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:0.5rem;">{% endif %}
+          <p style="color:var(--gray);font-size:0.8rem;">Click to upload (JPG/PNG, max 5MB)</p>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+      </div>
+      <div class="row2">
+        <div class="fg"><label>Full Name</label><input type="text" id="fullName" placeholder="Arjun Krishnan P S" value="{{ resume.full_name }}"></div>
+        <div class="fg"><label>Email</label><input type="email" id="email" placeholder="arjun@email.com" value="{{ resume.email }}"></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><label>Phone</label><input type="tel" id="phone" placeholder="+91 98765 43210" value="{{ resume.phone }}"></div>
+        <div class="fg"><label>Location</label><input type="text" id="location" placeholder="Palakkad, Kerala" value="{{ resume.location }}"></div>
+      </div>
+      <div class="fg"><label>Professional Summary</label><textarea id="summary" placeholder="2-4 sentences about your skills, experience and career goals...">{{ resume.summary }}</textarea></div>
+      <div class="nav-btns">
+        <button class="btn btn-primary" onclick="goStep(1)">Next: Education <i class="fa-solid fa-arrow-right"></i></button>
+        <div class="save-indicator" id="saveIndicator"><i class="fa-regular fa-circle-check"></i> Auto-saved</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Education -->
+    <div class="form-section" id="step-1">
+      <div class="section-header"><h2>Education</h2><p>School, college, diploma or short courses</p></div>
+      <div id="educationList"></div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn-add" onclick="addEducation({},'school')" style="flex:1;"><i class="fa-solid fa-school"></i> Add School (10th/12th)</button>
+        <button class="btn-add" onclick="addEducation({},'college')" style="flex:1;"><i class="fa-solid fa-graduation-cap"></i> Add College/Diploma</button>
+        <button class="btn-add" onclick="addEducation({},'course')" style="flex:1;"><i class="fa-solid fa-book"></i> Add Short Course</button>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(0)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(2)">Next: Experience <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 2: Experience -->
+    <div class="form-section" id="step-2">
+      <div class="section-header"><h2>Work Experience / Internships</h2><p>Jobs, internships, freelance</p></div>
+      <div id="experienceList"></div>
+      <button class="btn-add" onclick="addExperience()"><i class="fa-solid fa-plus"></i> Add Experience</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(3)">Next: Skills <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 3: Skills -->
+    <div class="form-section" id="step-3">
+      <div class="section-header"><h2>Technical Skills</h2><p>Programming languages, tools, frameworks</p></div>
+      <div class="fg">
+        <label>Technical Skills</label>
+        <div class="skills-container" id="skillTags"></div>
+        <div class="skill-input-row">
+          <input type="text" id="skillInput" placeholder="e.g. Python, Django, React" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addSkill('skillTags','skillInput');}">
+          <button class="btn btn-outline btn-sm" onclick="addSkill('skillTags','skillInput')">Add</button>
+        </div>
+        <p style="font-size:0.75rem;color:var(--gray);margin-top:0.3rem;">Press Enter or comma to add. Separate multiple with commas.</p>
+      </div>
+      <div class="fg" style="margin-top:1.5rem;">
+        <label>Soft Skills</label>
+        <div class="skills-container" id="softTags"></div>
+        <div class="skill-input-row">
+          <input type="text" id="softInput" placeholder="e.g. Leadership, Communication, Teamwork" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addSkill('softTags','softInput');}">
+          <button class="btn btn-outline btn-sm" onclick="addSkill('softTags','softInput')">Add</button>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(4)">Next: Projects <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 4: Projects -->
+    <div class="form-section" id="step-4">
+      <div class="section-header"><h2>Projects</h2><p>Personal, academic or professional projects</p></div>
+      <div id="projectList"></div>
+      <button class="btn-add" onclick="addProject()"><i class="fa-solid fa-plus"></i> Add Project</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(3)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(5)">Next: Certifications <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 5: Certifications -->
+    <div class="form-section" id="step-5">
+      <div class="section-header"><h2>Certifications</h2><p>Courses completed, certificates earned</p></div>
+      <div id="certList"></div>
+      <button class="btn-add" onclick="addCert()"><i class="fa-solid fa-plus"></i> Add Certification</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(4)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(6)">Next: Languages <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 6: Languages -->
+    <div class="form-section" id="step-6">
+      <div class="section-header"><h2>Languages Known</h2><p>Human languages you speak</p></div>
+      <div id="langList"></div>
+      <button class="btn-add" onclick="addLang()"><i class="fa-solid fa-plus"></i> Add Language</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(5)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(7)">Next: Achievements <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 7: Achievements -->
+    <div class="form-section" id="step-7">
+      <div class="section-header"><h2>Achievements & Awards</h2><p>Prizes, honours, recognitions</p></div>
+      <div id="achieveList"></div>
+      <button class="btn-add" onclick="addAchieve()"><i class="fa-solid fa-plus"></i> Add Achievement</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(6)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(8)">Next: Coursework <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 8: Relevant Coursework -->
+    <div class="form-section" id="step-8">
+      <div class="section-header"><h2>Relevant Coursework</h2><p>Subjects relevant to your target role</p></div>
+      <div class="fg">
+        <label>Courses / Subjects</label>
+        <div class="skills-container" id="courseTags"></div>
+        <div class="skill-input-row">
+          <input type="text" id="courseInput" placeholder="e.g. Data Structures, Operating Systems" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addSkill('courseTags','courseInput');}">
+          <button class="btn btn-outline btn-sm" onclick="addSkill('courseTags','courseInput')">Add</button>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(7)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(9)">Next: Volunteer <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 9: Volunteer -->
+    <div class="form-section" id="step-9">
+      <div class="section-header"><h2>Volunteer Experience</h2><p>Community service, NGO work, events</p></div>
+      <div id="volunteerList"></div>
+      <button class="btn-add" onclick="addVolunteer()"><i class="fa-solid fa-plus"></i> Add Volunteer Experience</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(8)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(10)">Next: Activities <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 10: Extracurricular -->
+    <div class="form-section" id="step-10">
+      <div class="section-header"><h2>Extracurricular & Positions</h2><p>Clubs, sports, leadership roles</p></div>
+      <div id="extraList"></div>
+      <button class="btn-add" onclick="addExtra()"><i class="fa-solid fa-plus"></i> Add Activity</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(9)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(11)">Next: Hobbies <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 11: Hobbies -->
+    <div class="form-section" id="step-11">
+      <div class="section-header"><h2>Interests & Hobbies</h2><p>What you enjoy outside work/study</p></div>
+      <div class="fg">
+        <label>Hobbies / Interests</label>
+        <div class="skills-container" id="hobbyTags"></div>
+        <div class="skill-input-row">
+          <input type="text" id="hobbyInput" placeholder="e.g. Photography, Gaming, Chess" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addSkill('hobbyTags','hobbyInput');}">
+          <button class="btn btn-outline btn-sm" onclick="addSkill('hobbyTags','hobbyInput')">Add</button>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(10)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(12)">Next: References <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 12: References -->
+    <div class="form-section" id="step-12">
+      <div class="section-header"><h2>References</h2><p>People who can vouch for you (optional)</p></div>
+      <div id="refList"></div>
+      <button class="btn-add" onclick="addRef()"><i class="fa-solid fa-plus"></i> Add Reference</button>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(11)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <button class="btn btn-primary" onclick="goStep(13)">Next: Social Links <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Step 13: Social Links -->
+    <div class="form-section" id="step-13">
+      <div class="section-header"><h2>Social Links</h2><p>LinkedIn, GitHub, Portfolio, etc.</p></div>
+      <div class="fg"><label><i class="fa-brands fa-linkedin"></i> LinkedIn URL</label><input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourusername" value="{{ resume.linkedin }}"></div>
+      <div class="fg"><label><i class="fa-brands fa-github"></i> GitHub URL</label><input type="url" id="github" placeholder="https://github.com/yourusername" value="{{ resume.github }}"></div>
+      <div class="fg"><label><i class="fa-solid fa-globe"></i> Portfolio / Website</label><input type="url" id="website" placeholder="https://yourportfolio.com" value="{{ resume.website }}"></div>
+      <div class="fg"><label><i class="fa-brands fa-twitter"></i> Twitter / X</label><input type="url" id="twitter" placeholder="https://twitter.com/yourusername" value="{{ resume.twitter }}"></div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="goStep(12)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <a href="{% url 'preview_resume' resume.pk %}" target="_blank" class="btn btn-primary"><i class="fa-solid fa-eye"></i> Preview Resume</a>
+        <a href="{% url 'download_pdf' resume.pk %}" target="_blank" class="btn btn-outline"><i class="fa-solid fa-download"></i> Download PDF</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE PREVIEW -->
+  <div class="builder-preview" id="builderPreview">
+    <div class="preview-toolbar">
+      <span><i class="fa-solid fa-eye"></i> Live Preview</span>
+      <div class="toolbar-actions">
+        <a href="{% url 'preview_resume' resume.pk %}" target="_blank" class="btn btn-ghost btn-sm">Full Page</a>
+        <a href="{% url 'download_pdf' resume.pk %}" target="_blank" class="btn btn-primary btn-sm"><i class="fa-solid fa-download"></i> PDF</a>
+      </div>
+    </div>
+    <div class="preview-frame-wrap">
+      <div id="liveResume" class="resume-doc" style="transform:scale(0.46);transform-origin:top center;margin-bottom:-58%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const RESUME_ID = {{ resume.pk }};
+const SAVE_URL  = "{% url 'save_resume' resume.pk %}";
+const UPLOAD_URL= "{% url 'upload_photo' resume.pk %}";
+const CSRF      = "{{ csrf_token }}";
+let saveTimer=null, currentTemplate="{{ resume.template }}";
+let state={{ resume_json|safe }};
+
+/* ── DATA ─────────────────────────────────────────── */
+function getData(){
+  return {
+    title: v('resumeTitle'), template: currentTemplate,
+    full_name: v('fullName'), email: v('email'), phone: v('phone'),
+    location: v('location'), summary: v('summary'),
+    linkedin: v('linkedin'), github: v('github'), website: v('website'), twitter: v('twitter'),
+    education:       getItems('educationList'),
+    experience:      getItems('experienceList'),
+    skills:          getTags('skillTags'),
+    soft_skills:     getTags('softTags'),
+    projects:        getItems('projectList'),
+    certifications:  getItems('certList'),
+    languages:       getItems('langList'),
+    achievements:    getItems('achieveList'),
+    courses:         getTags('courseTags'),
+    volunteer:       getItems('volunteerList'),
+    extracurricular: getItems('extraList'),
+    references:      getItems('refList'),
+    hobbies:         getTags('hobbyTags'),
+  };
+}
+function v(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+function getItems(id){
+  const l=document.getElementById(id); if(!l)return [];
+  return Array.from(l.querySelectorAll('.dynamic-section')).map(ds=>{
+    const o={}; ds.querySelectorAll('[data-field]').forEach(e=>{o[e.dataset.field]=e.value;}); return o;
+  });
+}
+function getTags(id){return Array.from(document.querySelectorAll(`#${id} .skill-tag`)).map(t=>t.dataset.val);}
+
+/* ── SAVE ─────────────────────────────────────────── */
+function scheduleSave(){
+  const ind=document.getElementById('saveIndicator');
+  if(ind){ind.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';ind.className='save-indicator saving';}
+  clearTimeout(saveTimer); saveTimer=setTimeout(saveNow,1400);
+}
+async function saveNow(){
+  const data=getData();
+  try{
+    const r=await fetch(SAVE_URL,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':CSRF},body:JSON.stringify(data)});
+    const j=await r.json();
+    const ind=document.getElementById('saveIndicator');
+    if(ind){ind.innerHTML=`<i class="fa-regular fa-circle-check"></i> Saved ${j.updated_at||''}`;ind.className='save-indicator';}
+    renderPreview(data);
+  }catch(e){console.error(e);}
+}
+
+/* ── NAVIGATION ───────────────────────────────────── */
+function goStep(n){
+  document.querySelectorAll('.form-section').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.step-item').forEach((s,i)=>{
+    s.classList.toggle('active',i===n);
+    if(i<n)s.classList.add('done'); else s.classList.remove('done');
+  });
+  document.getElementById('builderForm').scrollTop=0;
+  scheduleSave();
+}
+function setTemplate(t){
+  currentTemplate=t;
+  document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim().toLowerCase().replace(' ','')===t));
+  renderPreview(getData()); scheduleSave();
+}
+
+/* ── HELPERS ──────────────────────────────────────── */
+function mkI(field,ph,type='text'){
+  return `<input type="${type}" data-field="${field}" placeholder="${ph}" oninput="scheduleSave()" style="width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;outline:none;background:white;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">`;
+}
+function mkT(field,ph){
+  return `<textarea data-field="${field}" placeholder="${ph}" oninput="scheduleSave()" rows="3" style="width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;resize:vertical;outline:none;background:white;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"></textarea>`;
+}
+function mkS(field,opts){
+  return `<select data-field="${field}" onchange="scheduleSave()" style="width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;outline:none;background:white;">${opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+}
+function wrap(title,inner){
+  return `<div class="dynamic-section"><div class="ds-header"><h4>${title}</h4><button class="btn-remove" onclick="this.closest('.dynamic-section').remove();scheduleSave()"><i class="fa-solid fa-trash"></i> Remove</button></div>${inner}</div>`;
+}
+
+/* ── EDUCATION ────────────────────────────────────── */
+function addEducation(d={},type='college'){
+  const t=d.edu_type||type;
+  const n=document.getElementById('educationList').children.length+1;
+  let inner='';
+  const typeSelect=`<div class="fg"><label>Type</label><select data-field="edu_type" onchange="switchEduType(this)" style="width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.83rem;outline:none;background:white;">
+    <option value="school"${t==='school'?' selected':''}>🏫 School (10th / 12th)</option>
+    <option value="college"${t==='college'?' selected':''}>🎓 College / Diploma / Degree</option>
+    <option value="course"${t==='course'?' selected':''}>📚 Short Course / Certification</option>
+  </select></div>`;
+  if(t==='school'){
+    inner=typeSelect+
+      `<div class="row2">${mkI('degree','Class (e.g. 10th SSC / 12th HSC)')}${mkI('stream','Stream (e.g. Science, Commerce, Maths)')}</div>`+
+      `<div class="fg"><label>School Name</label>${mkI('institution','e.g. Sree Krishna Puram High School')}</div>`+
+      `<div class="row3">${mkI('start','Join Year')}${mkI('end','Pass Year')}${mkI('grade','Marks %')}</div>`;
+  } else if(t==='course'){
+    inner=typeSelect+
+      `<div class="row2">${mkI('degree','Course Name (e.g. Python, MERN Stack)')}${mkI('institution','Platform / Institute')}</div>`+
+      `<div class="row2">${mkI('start','Start (e.g. Jan 2024)')}${mkI('end','End (e.g. Jun 2024)')}</div>`;
+  } else {
+    inner=typeSelect+
+      `<div class="row2">${mkI('degree','Degree (e.g. B.Tech, Diploma)')}${mkI('field','Field of Study (e.g. Computer Science)')}</div>`+
+      `<div class="fg"><label>Stream / Specialisation (optional)</label>${mkI('stream','e.g. Computer Science, Electronics')}</div>`+
+      `<div class="fg"><label>College / University</label>${mkI('institution','e.g. APJ Abdul Kalam Technological University')}</div>`+
+      `<div class="row3">${mkI('start','Start Year')}${mkI('end','End Year / Expected')}${mkI('grade','Grade / CGPA / %')}</div>`;
+  }
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`${t==='school'?'🏫 School':'t'==='course'?'📚 Course':'🎓 College'} #${n}`,inner);
+  document.getElementById('educationList').appendChild(el.firstChild);
+  if(d.degree||d.institution){
+    fillItem(document.getElementById('educationList').lastElementChild,d);
+  }
+}
+function switchEduType(sel){
+  const ds=sel.closest('.dynamic-section');
+  const d={}; ds.querySelectorAll('[data-field]').forEach(e=>{d[e.dataset.field]=e.value;});
+  d.edu_type=sel.value;
+  ds.remove();
+  addEducation(d,d.edu_type);
+  scheduleSave();
+}
+
+/* ── OTHER SECTIONS ───────────────────────────────── */
+function addExperience(d={}){
+  const n=document.getElementById('experienceList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Experience #${n}`,
+    `<div class="row2">${mkI('title','Job Title / Role')}${mkI('company','Company / Organisation')}</div>`+
+    `<div class="row2">${mkI('location','Location (optional)')}${mkI('start','Start (e.g. Jun 2023)')}</div>`+
+    `<div class="fg"><label>End Date (or "Present")</label>${mkI('end','End date or Present')}</div>`+
+    `<div class="fg"><label>Responsibilities / Achievements</label>${mkT('description','• Built REST APIs using Django\n• Reduced load time by 40%\n• Led a team of 4 developers')}</div>`
+  );
+  document.getElementById('experienceList').appendChild(el.firstChild);
+  if(d.title)fillItem(document.getElementById('experienceList').lastElementChild,d);
+}
+function addProject(d={}){
+  const n=document.getElementById('projectList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Project #${n}`,
+    `<div class="fg"><label>Project Name</label>${mkI('name','e.g. ResumeForge AI')}</div>`+
+    `<div class="row2">${mkI('tech','Technologies (e.g. Django, React, PostgreSQL)')}${mkI('link','Project Link (GitHub / Live URL)','url')}</div>`+
+    `<div class="fg"><label>Description</label>${mkT('description','What problem did it solve? What did you build?')}</div>`
+  );
+  document.getElementById('projectList').appendChild(el.firstChild);
+  if(d.name)fillItem(document.getElementById('projectList').lastElementChild,d);
+}
+function addCert(d={}){
+  const n=document.getElementById('certList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Certification #${n}`,
+    `<div class="row2">${mkI('name','Certificate Name')}${mkI('issuer','Issuing Organisation')}</div>`+
+    `<div class="row2">${mkI('date','Date Obtained')}${mkI('id','Credential ID (optional)')}</div>`
+  );
+  document.getElementById('certList').appendChild(el.firstChild);
+  if(d.name)fillItem(document.getElementById('certList').lastElementChild,d);
+}
+function addLang(d={}){
+  const n=document.getElementById('langList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Language #${n}`,
+    `<div class="row2">${mkI('name','Language (e.g. Malayalam)')}${mkS('level',['Native','Fluent','Advanced','Intermediate','Basic'])}</div>`
+  );
+  document.getElementById('langList').appendChild(el.firstChild);
+  if(d.name)fillItem(document.getElementById('langList').lastElementChild,d);
+}
+function addAchieve(d={}){
+  const n=document.getElementById('achieveList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Achievement #${n}`,
+    `<div class="fg"><label>Title</label>${mkI('title','e.g. Winner — State Hackathon 2024')}</div>`+
+    `<div class="row2">${mkI('org','Organisation / Event')}${mkI('year','Year')}</div>`+
+    `<div class="fg"><label>Description (optional)</label>${mkT('description','Brief details...')}</div>`
+  );
+  document.getElementById('achieveList').appendChild(el.firstChild);
+  if(d.title)fillItem(document.getElementById('achieveList').lastElementChild,d);
+}
+function addVolunteer(d={}){
+  const n=document.getElementById('volunteerList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Volunteer #${n}`,
+    `<div class="row2">${mkI('role','Role / Position')}${mkI('org','Organisation')}</div>`+
+    `<div class="row2">${mkI('start','Start Date')}${mkI('end','End Date / Ongoing')}</div>`+
+    `<div class="fg"><label>Description (optional)</label>${mkT('description','What did you do?')}</div>`
+  );
+  document.getElementById('volunteerList').appendChild(el.firstChild);
+  if(d.role)fillItem(document.getElementById('volunteerList').lastElementChild,d);
+}
+function addExtra(d={}){
+  const n=document.getElementById('extraList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Activity #${n}`,
+    `<div class="fg"><label>Activity / Position</label>${mkI('name','e.g. President, Tech Club')}</div>`+
+    `<div class="fg"><label>Description (optional)</label>${mkT('description','Brief details...')}</div>`
+  );
+  document.getElementById('extraList').appendChild(el.firstChild);
+  if(d.name)fillItem(document.getElementById('extraList').lastElementChild,d);
+}
+function addRef(d={}){
+  const n=document.getElementById('refList').children.length+1;
+  const el=document.createElement('div');
+  el.innerHTML=wrap(`Reference #${n}`,
+    `<div class="row2">${mkI('name','Full Name')}${mkI('role','Job Title')}</div>`+
+    `<div class="row2">${mkI('org','Organisation')}${mkI('contact','Email / Phone')}</div>`
+  );
+  document.getElementById('refList').appendChild(el.firstChild);
+  if(d.name)fillItem(document.getElementById('refList').lastElementChild,d);
+}
+
+/* ── TAG SYSTEM ───────────────────────────────────── */
+function addSkill(containerId,inputId){
+  const inp=document.getElementById(inputId);
+  const vals=inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+  vals.forEach(s=>{
+    const t=document.createElement('span');
+    t.className='skill-tag';t.dataset.val=s;
+    t.innerHTML=`${s}<button onclick="this.parentNode.remove();scheduleSave()">×</button>`;
+    document.getElementById(containerId).appendChild(t);
+  });
+  inp.value=''; scheduleSave();
+}
+
+function fillItem(el,d){
+  if(!el)return;
+  Object.entries(d).forEach(([k,val])=>{
+    const f=el.querySelector(`[data-field="${k}"]`);
+    if(f)f.value=val;
+  });
+}
+
+function loadTags(containerId,arr){
+  arr.forEach(s=>{
+    const t=document.createElement('span');
+    t.className='skill-tag';t.dataset.val=s;
+    t.innerHTML=`${s}<button onclick="this.parentNode.remove();scheduleSave()">×</button>`;
+    document.getElementById(containerId).appendChild(t);
+  });
+}
+
+/* ── LOAD STATE ───────────────────────────────────── */
+function loadState(){
+  const s=state;
+  (s.education||[]).forEach(d=>addEducation(d,d.edu_type||'college'));
+  (s.experience||[]).forEach(d=>{addExperience();fillItem(document.getElementById('experienceList').lastElementChild,d);});
+  loadTags('skillTags', s.skills||[]);
+  loadTags('softTags',  s.soft_skills||[]);
+  (s.projects||[]).forEach(d=>{addProject();fillItem(document.getElementById('projectList').lastElementChild,d);});
+  (s.certifications||[]).forEach(d=>{addCert();fillItem(document.getElementById('certList').lastElementChild,d);});
+  (s.languages||[]).forEach(d=>{addLang();fillItem(document.getElementById('langList').lastElementChild,d);});
+  (s.achievements||[]).forEach(d=>{addAchieve();fillItem(document.getElementById('achieveList').lastElementChild,d);});
+  loadTags('courseTags', s.courses||[]);
+  (s.volunteer||[]).forEach(d=>{addVolunteer();fillItem(document.getElementById('volunteerList').lastElementChild,d);});
+  (s.extracurricular||[]).forEach(d=>{addExtra();fillItem(document.getElementById('extraList').lastElementChild,d);});
+  (s.references||[]).forEach(d=>{addRef();fillItem(document.getElementById('refList').lastElementChild,d);});
+  loadTags('hobbyTags', s.hobbies||[]);
+  setTemplate(s.template||'modern');
+  renderPreview(getData());
+}
+
+/* ── PHOTO UPLOAD ─────────────────────────────────── */
+async function uploadPhoto(inp){
+  if(!inp.files[0])return;
+  const fd=new FormData(); fd.append('photo',inp.files[0]);
+  const r=await fetch(UPLOAD_URL,{method:'POST',headers:{'X-CSRFToken':CSRF},body:fd});
+  const j=await r.json();
+  if(j.status==='ok'){
+    const p=document.getElementById('photoPreview');
+    p.src=j.photo_url; p.style.display='block';
+    const ic=document.getElementById('uploadIcon'); if(ic)ic.style.display='none';
+    state.photo_url=j.photo_url;
+    renderPreview(getData());
+  }
+}
+
+/* ── LIVE PREVIEW RENDERER ────────────────────────── */
+function renderPreview(d){
+  const el=document.getElementById('liveResume');
+  el.className=`resume-doc tpl-${d.template}`;
+  const ph=state.photo_url
+    ?`<img src="${state.photo_url}" class="res-photo" alt="">`
+    :(d.full_name?`<div class="res-photo-initial">${d.full_name[0].toUpperCase()}</div>`:'');
+  const ci=[d.email&&`✉ ${d.email}`,d.phone&&`☏ ${d.phone}`,d.location&&`⌖ ${d.location}`,d.linkedin&&'LinkedIn',d.github&&'GitHub'].filter(Boolean).map(x=>`<span>${x}</span>`).join(' ');
+
+  let html='';
+  if(d.template==='modern'){
+    const left=sec('Skills',d.skills,'tags','modern')+sec('Soft Skills',d.soft_skills,'tags','modern')+sec('Languages',d.languages,'langs','modern')+sec('Certifications',d.certifications,'certs','modern');
+    const right=sec('Summary',d.summary,'txt','modern')+sec('Experience',d.experience,'exp','modern')+sec('Education',d.education,'edu','modern')+sec('Projects',d.projects,'proj','modern')+sec('Achievements',d.achievements,'ach','modern');
+    html=`<div class="res-header"><div style="display:flex;justify-content:space-between;align-items:center;">${ph?`<div style="order:2">${ph}</div>`:''}<div><h1>${d.full_name||'Your Name'}</h1><p class="res-title">${(d.experience&&d.experience[0]&&d.experience[0].title)||'Your Role'}</p><div class="res-contact">${ci}</div></div></div></div><div class="res-body"><div class="res-left">${left}</div><div class="res-right">${right}</div></div>`;
+  } else if(d.template==='corporate'){
+    const left=sec('Skills',d.skills,'tags','corporate')+sec('Soft Skills',d.soft_skills,'plain','corporate')+sec('Languages',d.languages,'langs','corporate')+sec('Certifications',d.certifications,'certs','corporate');
+    const right=sec('Summary',d.summary,'txt','corporate')+sec('Experience',d.experience,'exp','corporate')+sec('Education',d.education,'edu','corporate')+sec('Projects',d.projects,'proj','corporate')+sec('Achievements',d.achievements,'ach','corporate');
+    html=`<div class="res-header"><div><h1>${d.full_name||'Your Name'}</h1><div class="res-contact">${d.email||''} · ${d.phone||''} · ${d.location||''}</div></div>${ph}</div><div class="res-body" style="display:grid;grid-template-columns:160px 1fr;"><div class="res-left" style="background:#f8fafc;padding:18px 14px;border-right:1.5px solid #e2e8f0;">${left}</div><div style="padding:18px 22px;">${right}</div></div>`;
+  } else if(d.template==='bold'){
+    const left=`<div style="text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:12px;">${ph||`<div style="width:68px;height:68px;border-radius:50%;background:#1f2937;border:3px solid #4ade80;display:flex;align-items:center;justify-content:center;font-size:18pt;font-weight:800;color:#4ade80;margin:0 auto;">${(d.full_name||'?')[0]}</div>`}<h1 style="font-size:12pt;font-weight:800;color:white;margin-top:8px;line-height:1.2;">${d.full_name||'Your Name'}</h1>${(d.experience&&d.experience[0]&&d.experience[0].title)?`<p style="font-size:7.5pt;opacity:.7;color:white;">${d.experience[0].title}</p>`:''}</div>`+
+      `<div style="font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#4ade80;margin:12px 0 6px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:3px;">Contact</div>`+
+      [d.email,d.phone,d.location].filter(Boolean).map(x=>`<div style="font-size:7.5pt;color:rgba(255,255,255,.8);margin-bottom:4px;">• ${x}</div>`).join('')+
+      sec('Skills',d.skills,'boldtags','bold')+sec('Languages',d.languages,'langs','bold');
+    const right=sec('Summary',d.summary,'txt','bold')+sec('Experience',d.experience,'exp','bold')+sec('Education',d.education,'edu','bold')+sec('Projects',d.projects,'proj','bold')+sec('Certifications',d.certifications,'certs','bold')+sec('Achievements',d.achievements,'ach','bold');
+    html=`<div style="display:grid;grid-template-columns:185px 1fr;min-height:297mm;"><div style="background:#111827;padding:22px 14px;">${left}</div><div style="padding:20px 22px;">${right}</div></div>`;
+  } else if(d.template==='elegant'){
+    html=`<div style="padding:26px 34px 16px;border-top:5px solid #d4a017;text-align:center;">${ph?`<div style="margin:0 auto 8px;">${ph}</div>`:''}<h1 style="font-size:22pt;font-weight:700;color:#1a1a1a;">${d.full_name||'Your Name'}</h1>${(d.experience&&d.experience[0]&&d.experience[0].title)?`<p style="color:#d4a017;font-weight:600;font-size:9pt;text-transform:uppercase;letter-spacing:.1em;margin:4px 0 8px;">${d.experience[0].title}</p>`:''}<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:7.5pt;color:#555;border-top:1px solid #e5e7eb;padding-top:8px;margin-top:8px;">${ci}</div></div><div style="padding:16px 34px;">${sec('Profile',d.summary,'txt','elegant')+sec('Experience',d.experience,'exp','elegant')+sec('Education',d.education,'edu','elegant')+sec('Skills',d.skills,'elegant_tags','elegant')+sec('Projects',d.projects,'proj','elegant')+sec('Certifications',d.certifications,'certs','elegant')+sec('Achievements',d.achievements,'ach','elegant')}</div>`;
+  } else if(d.template==='creative'){
+    html=`<div class="res-header" style="background:linear-gradient(135deg,#064e3b,#059669,#10b981);color:white;padding:26px 28px;"><div style="display:flex;justify-content:space-between;align-items:center;">${ph?`<div>${ph}</div>`:''}<div style="flex:1;padding-right:10px;"><h1 style="font-size:20pt;font-weight:900;">${d.full_name||'Your Name'}</h1>${(d.experience&&d.experience[0]&&d.experience[0].title)?`<p style="opacity:.9;font-size:9.5pt;">${d.experience[0].title}</p>`:''}<div style="display:flex;flex-wrap:wrap;gap:5px 12px;font-size:7.5pt;margin-top:8px;">${ci}</div></div></div></div><div style="padding:18px 26px;">${sec('Summary',d.summary,'txt','creative')+sec('Experience',d.experience,'exp','creative')+sec('Education',d.education,'edu','creative')+sec('Projects',d.projects,'proj','creative')+sec('Skills',d.skills,'pills','creative')+sec('Achievements',d.achievements,'ach','creative')}</div>`;
+  } else {
+    // minimal
+    html=`<div style="padding:24px 34px 14px;border-bottom:2.5px solid #111;"><h1 style="font-size:22pt;font-weight:800;letter-spacing:-.5px;">${d.full_name||'Your Name'}</h1><div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:7.5pt;color:#555;margin-top:8px;">${ci}</div></div><div style="padding:14px 34px;">${sec('Summary',d.summary,'txt','minimal')+sec('Experience',d.experience,'exp','minimal')+sec('Education',d.education,'edu','minimal')+sec('Skills',d.skills,'plain','minimal')+sec('Projects',d.projects,'proj','minimal')+sec('Certifications',d.certifications,'certs','minimal')}</div>`;
+  }
+  el.innerHTML=html;
+}
+
+function secTitle(t,tpl){
+  if(tpl==='creative')return`<div style="font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#064e3b;margin:13px 0 7px;display:flex;align-items:center;gap:6px;">${t}<span style="flex:1;height:1.5px;background:linear-gradient(to right,#6ee7b7,transparent);display:block;"></span></div>`;
+  if(tpl==='bold')return`<div style="font-size:6pt;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#4ade80;margin:13px 0 6px;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:3px;">${t}</div>`;
+  if(tpl==='elegant')return`<div style="font-size:11pt;font-weight:700;color:#1a1a1a;margin:14px 0 7px;padding-bottom:3px;border-bottom:1.5px solid #d4a017;">${t}</div>`;
+  const colors={modern:'#16a34a',minimal:'#111',corporate:'#1e293b'};
+  return`<div style="font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:${colors[tpl]||'#111'};margin:13px 0 7px;padding-bottom:3px;border-bottom:2px solid ${colors[tpl]||'#111'};">${t}</div>`;
+}
+function sec(title,data,type,tpl){
+  if(!data||(Array.isArray(data)&&!data.length)||(!Array.isArray(data)&&!data))return'';
+  const T=secTitle(title,tpl);
+  const dc=tpl==='bold'?'rgba(255,255,255,.85)':'#333';
+  const sc=tpl==='bold'?'rgba(255,255,255,.6)':'#666';
+  if(type==='txt')return`${T}<p style="font-size:8.5pt;line-height:1.6;color:${dc};margin-bottom:6px;">${data}</p>`;
+  if(type==='tags')return`${T}<div>${data.map(s=>`<span style="display:inline-block;background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:10px;font-size:7pt;margin:2px;font-weight:600;">${s}</span>`).join('')}</div>`;
+  if(type==='boldtags')return`${T}<div>${data.map(s=>`<span style="display:block;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);padding:3px 10px;border-radius:4px;font-size:7pt;margin:3px 0;font-weight:600;">${s}</span>`).join('')}</div>`;
+  if(type==='pills')return`${T}<div>${data.map(s=>`<span style="display:inline-block;background:#ecfdf5;color:#064e3b;border:1.5px solid #6ee7b7;padding:2px 10px;border-radius:14px;font-size:7pt;margin:2px;font-weight:600;">${s}</span>`).join('')}</div>`;
+  if(type==='elegant_tags')return`${T}<div>${data.map(s=>`<span style="display:inline-block;border:1px solid #d4a017;color:#92400e;padding:2px 10px;border-radius:3px;font-size:7pt;margin:2px;font-weight:600;">${s}</span>`).join('')}</div>`;
+  if(type==='plain')return`${T}<div>${data.map(s=>`<span style="display:inline-block;margin:2px 8px 2px 0;font-size:8pt;color:${dc};">${s}</span>`).join('')}</div>`;
+  if(type==='langs')return`${T}<div>${data.map(l=>`<div style="display:flex;justify-content:space-between;font-size:8pt;margin-bottom:4px;color:${dc};"><span>${l.name||''}</span><span style="color:${sc};font-style:italic;">${l.level||''}</span></div>`).join('')}</div>`;
+  if(type==='certs')return`${T}${data.map(c=>`<div style="margin-bottom:6px;font-size:8pt;"><span style="font-weight:700;color:${dc};">${c.name||''}</span> <span style="color:${sc};">— ${c.issuer||''} ${c.date||''}</span></div>`).join('')}`;
+  if(type==='edu')return`${T}<table style="width:100%;border-collapse:collapse;font-size:7.8pt;border:1px solid #e5e7eb;">${data.map(e=>`<tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:5px 8px;border-right:1px solid #e5e7eb;"><strong>${e.degree||''}${e.field?' in '+e.field:''}</strong>${e.stream?`<br><span style="font-size:6.5pt;color:#16a34a;font-weight:600;">Stream: ${e.stream}</span>`:''}</td><td style="padding:5px 8px;border-right:1px solid #e5e7eb;">${e.institution||''}</td><td style="padding:5px 8px;border-right:1px solid #e5e7eb;white-space:nowrap;">${e.start||''}${e.end?' – '+e.end:''}</td><td style="padding:5px 8px;font-weight:700;text-align:center;">${e.grade||'—'}</td></tr>`).join('')}</table>`;
+  if(type==='exp')return`${T}${data.map(e=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><span style="font-weight:700;font-size:9pt;color:${dc};">${e.title||''}</span><span style="font-size:7.5pt;color:${sc};white-space:nowrap;">${e.start||''}${e.end?' – '+e.end:''}</span></div><div style="font-size:8pt;color:${sc};margin:1px 0 3px;">${e.company||''}</div><div style="font-size:8pt;color:${dc};line-height:1.5;white-space:pre-line;">${e.description||''}</div></div>`).join('')}`;
+  if(type==='proj')return`${T}${data.map(p=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><span style="font-weight:700;font-size:9pt;color:${dc};">${p.name||''}</span><span style="font-size:7.5pt;color:${sc};">${p.tech||''}</span></div>${p.link?`<div style="font-size:7pt;color:#16a34a;">${p.link}</div>`:''}<div style="font-size:8pt;color:${dc};line-height:1.5;white-space:pre-line;">${p.description||''}</div></div>`).join('')}`;
+  if(type==='ach')return`${T}${data.map(a=>`<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:8pt;"><span style="font-weight:700;color:${dc};">${a.title||''}</span><span style="color:${sc};">${a.org||''} ${a.year||''}</span></div>`).join('')}`;
+  return '';
+}
+
+document.querySelectorAll('#builderForm input,#builderForm textarea,#builderForm select').forEach(el=>{el.addEventListener('input',scheduleSave);});
+window.addEventListener('load',loadState);
+</script>
+{% endblock %}

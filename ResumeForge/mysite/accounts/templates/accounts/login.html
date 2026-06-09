@@ -1,0 +1,41 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Sign In — ResumeForge{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="icon-wrap"><i class="fa-solid fa-right-to-bracket"></i></div>
+      <h1>Welcome Back</h1>
+      <p>Sign in to access your resumes</p>
+    </div>
+    <a href="{% url 'google_login' %}" class="social-btn">
+      <img src="https://www.google.com/favicon.ico" alt="Google"> Continue with Google
+    </a>
+    <div class="divider">or sign in with email</div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="non-field-errors">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        {{ form.email }}
+        {% if form.email.errors %}<div class="field-error"><i class="fa-solid fa-circle-xmark"></i>{{ form.email.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="field-error"><i class="fa-solid fa-circle-xmark"></i>{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div class="check-row">
+          {{ form.remember_me }} <label for="{{ form.remember_me.id_for_label }}">Remember me</label>
+        </div>
+        <a href="{% url 'forgot_password' %}" style="font-size:0.85rem;color:var(--green);text-decoration:none;font-weight:500;">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+    </form>
+    <div class="auth-footer">Don't have an account? <a href="{% url 'register' %}">Create one free</a></div>
+  </div>
+</div>
+{% endblock %}

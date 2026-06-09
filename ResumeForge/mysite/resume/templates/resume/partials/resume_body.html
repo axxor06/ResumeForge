@@ -1,0 +1,278 @@
+{% load resume_tags %}
+{% with tpl=resume.template edu=resume.get_education exp=resume.get_experience skills=resume.get_skills soft=resume.get_soft_skills projects=resume.get_projects certs=resume.get_certifications langs=resume.get_languages achievements=resume.get_achievements hobbies=resume.get_hobbies %}
+<div class="resume-doc tpl-{{ tpl }}">
+
+{# ══════════════════════════ MODERN ══════════════════════════ #}
+{% if tpl == "modern" %}
+<div class="res-header">
+  <div class="res-header-inner">
+    <div style="flex:1;">
+      <h1>{{ resume.full_name|default:"Your Name" }}</h1>
+      {% if exp %}<p class="res-role">{{ exp.0.title }}{% if exp.0.company %} · {{ exp.0.company }}{% endif %}</p>{% endif %}
+      <div class="res-contact">
+        {% if resume.email %}<span>✉ <a href="mailto:{{ resume.email }}">{{ resume.email }}</a></span>{% endif %}
+        {% if resume.phone %}<span>✆ {{ resume.phone }}</span>{% endif %}
+        {% if resume.location %}<span>⌖ {{ resume.location }}</span>{% endif %}
+        {% if resume.linkedin %}<span><a href="{{ resume.linkedin }}">LinkedIn</a></span>{% endif %}
+        {% if resume.github %}<span><a href="{{ resume.github }}">GitHub</a></span>{% endif %}
+        {% if resume.website %}<span><a href="{{ resume.website }}">Portfolio</a></span>{% endif %}
+      </div>
+    </div>
+    {% if resume.photo %}<img src="{{ resume.photo.url }}" class="res-photo" alt="">
+    {% elif resume.full_name %}<div class="res-photo-initial">{{ resume.full_name|first|upper }}</div>{% endif %}
+  </div>
+</div>
+<div class="res-body">
+  <div class="res-left">
+    {% if skills %}<div class="res-section-title">Technical Skills</div>
+    <div class="skills-wrap">{% for s in skills %}<span class="skill-chip">{{ s }}</span>{% endfor %}</div>{% endif %}
+    {% if soft %}<div class="res-section-title">Soft Skills</div>
+    {% for s in soft %}<div style="font-size:8pt;padding:2px 0;color:#1a1a1a;">▸ {{ s }}</div>{% endfor %}{% endif %}
+    {% if langs %}<div class="res-section-title">Languages</div>
+    {% for l in langs %}<div class="res-lang-row"><span>{{ l.name }}</span><span style="font-size:7.5pt;color:#666;font-style:italic;">{{ l.level }}</span></div>{% endfor %}{% endif %}
+    {% if certs %}<div class="res-section-title">Certifications</div>
+    {% for c in certs %}<div class="cert-row"><div style="font-weight:700;font-size:8pt;">{{ c.name }}</div><div style="font-size:7.5pt;color:#4b5563;">{{ c.issuer }}{% if c.date %} · {{ c.date }}{% endif %}</div></div>{% endfor %}{% endif %}
+    {% if hobbies %}<div class="res-section-title">Interests</div>
+    {% for h in hobbies %}<div style="font-size:8pt;padding:2px 0;">▸ {{ h }}</div>{% endfor %}{% endif %}
+  </div>
+  <div class="res-right">
+    {% if resume.summary %}<div class="res-section-title">Professional Summary</div>
+    <p class="res-summary">{{ resume.summary }}</p>{% endif %}
+    {% if exp %}<div class="res-section-title">Work Experience</div>
+    {% for e in exp %}<div class="res-item">
+      <div class="res-item-header"><span class="res-item-title">{{ e.title }}</span><span class="res-item-date">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</span></div>
+      <div class="res-item-sub">{{ e.company }}</div>
+      {% if e.description %}<div class="res-item-desc">{{ e.description }}</div>{% endif %}
+    </div>{% endfor %}{% endif %}
+    {% if edu %}<div class="res-section-title">Education</div>
+    <table class="edu-table">
+      <thead><tr><th>Qualification</th><th>Stream</th><th>Institution</th><th>Duration</th><th>Grade / %</th></tr></thead>
+      <tbody>{% for e in edu %}<tr>
+        <td><strong>{{ e.degree }}</strong></td>
+        <td>{% if e.stream %}{{ e.stream }}{% elif e.degree == "SSLC" or e.degree == "10th" %}General Education{% else %}{{ e.field|default:"—" }}{% endif %}</td>
+        <td>{{ e.institution }}</td>
+        <td style="white-space:nowrap;">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</td>
+        <td style="text-align:center;font-weight:700;">{% if e.grade %}{{ e.grade }}{% else %}—{% endif %}</td>
+      </tr>{% endfor %}</tbody>
+    </table>{% endif %}
+    {% if projects %}<div class="res-section-title">Key Projects</div>
+    {% for p in projects %}<div class="project-item">
+      <div class="project-title-row"><span class="project-name">{{ p.name }}</span></div>
+      {% if p.tech %}<div class="project-tech">{% for t in p.tech|split_tech %}<span class="project-tech-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+      {% if p.github or p.link %}<div class="project-links">{% if p.github %}<a href="{{ p.github }}">⟨/⟩ GitHub</a>{% endif %}{% if p.link %}<a href="{{ p.link }}">↗ Live Demo</a>{% endif %}</div>{% endif %}
+      {% if p.description %}<div class="res-item-desc">{{ p.description }}</div>{% endif %}
+    </div>{% endfor %}{% endif %}
+    {% if achievements %}<div class="res-section-title">Achievements & Awards</div>
+    {% for a in achievements %}<div class="achieve-row"><span class="res-item-title">{{ a.title }}</span><span style="font-size:7.5pt;color:#666;">{{ a.org }}{% if a.year %} · {{ a.year }}{% endif %}</span></div>{% endfor %}{% endif %}
+    {% if resume.full_name %}
+    <div class="declaration-block">
+      <div style="font-weight:700;font-size:7.5pt;text-transform:uppercase;letter-spacing:.1em;color:#15803d;margin-bottom:5px;">Declaration</div>
+      <div>I, {{ resume.full_name }}, hereby declare that the information provided above is true and correct to the best of my knowledge and belief.</div>
+      <div class="decl-sign"><div class="decl-name">{{ resume.full_name }}</div></div>
+    </div>{% endif %}
+  </div>
+</div>
+
+{# ══════════════════════════ MINIMAL ══════════════════════════ #}
+{% elif tpl == "minimal" %}
+<div class="res-header">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+    <div>
+      <h1>{{ resume.full_name|default:"Your Name" }}</h1>
+      {% if exp %}<p class="res-role">{{ exp.0.title }}</p>{% endif %}
+    </div>
+    {% if resume.photo %}<img src="{{ resume.photo.url }}" style="width:62px;height:62px;border-radius:8px;object-fit:cover;border:2px solid #e5e7eb;" alt="">{% endif %}
+  </div>
+  <div class="res-contact">
+    {% if resume.email %}<span>✉ {{ resume.email }}</span>{% endif %}
+    {% if resume.phone %}<span>✆ {{ resume.phone }}</span>{% endif %}
+    {% if resume.location %}<span>⌖ {{ resume.location }}</span>{% endif %}
+    {% if resume.linkedin %}<span>{{ resume.linkedin }}</span>{% endif %}
+    {% if resume.github %}<span>{{ resume.github }}</span>{% endif %}
+    {% if resume.website %}<span>{{ resume.website }}</span>{% endif %}
+  </div>
+</div>
+<div class="res-body">
+  {% if resume.summary %}<div class="res-section-title">Summary</div><p class="res-summary">{{ resume.summary }}</p>{% endif %}
+  {% if exp %}<div class="res-section-title">Experience</div>
+  {% for e in exp %}<div class="res-item">
+    <div class="res-item-header"><span class="res-item-title">{{ e.title }}</span><span class="res-item-date">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</span></div>
+    <div class="res-item-sub">{{ e.company }}</div>
+    {% if e.description %}<div class="res-item-desc">{{ e.description }}</div>{% endif %}
+  </div>{% endfor %}{% endif %}
+  {% if edu %}<div class="res-section-title">Education</div>
+  <table class="edu-table">
+    <thead><tr><th>Qualification</th><th>Stream</th><th>Institution</th><th>Duration</th><th>Grade / %</th></tr></thead>
+    <tbody>{% for e in edu %}<tr>
+      <td><strong>{{ e.degree }}</strong></td>
+      <td>{% if e.stream %}{{ e.stream }}{% elif e.degree == "SSLC" or e.degree == "10th" %}General Education{% else %}{{ e.field|default:"—" }}{% endif %}</td>
+      <td>{{ e.institution }}</td>
+      <td style="white-space:nowrap;">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</td>
+      <td style="text-align:center;font-weight:700;">{% if e.grade %}{{ e.grade }}{% else %}—{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table>{% endif %}
+  {% if skills %}<div class="res-section-title">Skills</div>
+  <div>{% for s in skills %}<span style="display:inline-block;margin:2px 8px 2px 0;font-size:8.5pt;">{{ s }}{% if not forloop.last %}<span style="color:#ccc;"> ·</span>{% endif %}</span>{% endfor %}</div>{% endif %}
+  {% if soft %}<div class="res-section-title">Soft Skills</div>
+  <div>{% for s in soft %}<span style="display:inline-block;margin:2px 8px 2px 0;font-size:8.5pt;color:#555;">{{ s }}{% if not forloop.last %}<span style="color:#ccc;"> ·</span>{% endif %}</span>{% endfor %}</div>{% endif %}
+  {% if projects %}<div class="res-section-title">Projects</div>
+  {% for p in projects %}<div class="project-item">
+    <div class="project-title-row"><span class="project-name">{{ p.name }}</span></div>
+    {% if p.tech %}<div class="project-tech">{% for t in p.tech|split_tech %}<span class="project-tech-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+    {% if p.description %}<div class="res-item-desc">{{ p.description }}</div>{% endif %}
+  </div>{% endfor %}{% endif %}
+  {% if certs %}<div class="res-section-title">Certifications</div>
+  {% for c in certs %}<div class="cert-row"><strong>{{ c.name }}</strong> — {{ c.issuer }}{% if c.date %} · {{ c.date }}{% endif %}</div>{% endfor %}{% endif %}
+  {% if achievements %}<div class="res-section-title">Achievements</div>
+  {% for a in achievements %}<div class="achieve-row"><span class="res-item-title">{{ a.title }}</span><span style="font-size:7.5pt;color:#666;">{{ a.org }}{% if a.year %} · {{ a.year }}{% endif %}</span></div>{% endfor %}{% endif %}
+  {% if langs %}<div class="res-section-title">Languages</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px 24px;">{% for l in langs %}<span style="font-size:8.5pt;"><strong>{{ l.name }}</strong> <span style="color:#888;">({{ l.level }})</span></span>{% endfor %}</div>{% endif %}
+  {% if hobbies %}<div class="res-section-title">Interests & Hobbies</div>
+  <p style="font-size:8.5pt;color:#555;">{{ hobbies|join:" · " }}</p>{% endif %}
+  {% if resume.full_name %}
+  <div class="declaration-block">
+    <div style="font-weight:700;font-size:7.5pt;text-transform:uppercase;letter-spacing:.1em;color:#111;margin-bottom:5px;">Declaration</div>
+    <div>I, {{ resume.full_name }}, hereby declare that the information provided above is true and correct to the best of my knowledge and belief.</div>
+    <div class="decl-sign"><div class="decl-name">{{ resume.full_name }}</div></div>
+  </div>{% endif %}
+</div>
+
+{# ══════════════════════════ CORPORATE ══════════════════════════ #}
+{% elif tpl == "corporate" %}
+<div class="res-header">
+  <div>
+    <h1>{{ resume.full_name|default:"Your Name" }}</h1>
+    {% if exp %}<p class="res-role">{{ exp.0.title }}</p>{% endif %}
+    <div class="res-contact">
+      {% if resume.email %}<span>✉ {{ resume.email }}</span>{% endif %}
+      {% if resume.phone %}<span>✆ {{ resume.phone }}</span>{% endif %}
+      {% if resume.location %}<span>⌖ {{ resume.location }}</span>{% endif %}
+      {% if resume.linkedin %}<span>{{ resume.linkedin }}</span>{% endif %}
+      {% if resume.github %}<span>{{ resume.github }}</span>{% endif %}
+    </div>
+  </div>
+  {% if resume.photo %}<img src="{{ resume.photo.url }}" class="res-photo" alt="">
+  {% elif resume.full_name %}<div class="res-photo-initial">{{ resume.full_name|first|upper }}</div>{% endif %}
+</div>
+<div class="res-body">
+  <div class="res-left">
+    {% if skills %}<div class="res-section-title">Technical Skills</div>
+    <div>{% for s in skills %}<span class="corp-skill">{{ s }}</span>{% endfor %}</div>{% endif %}
+    {% if soft %}<div class="res-section-title">Soft Skills</div>
+    {% for s in soft %}<div style="font-size:7.5pt;padding:2px 0;color:#334155;">▸ {{ s }}</div>{% endfor %}{% endif %}
+    {% if langs %}<div class="res-section-title">Languages</div>
+    {% for l in langs %}<div class="res-lang-row" style="color:#334155;"><span>{{ l.name }}</span><span style="font-size:7.5pt;color:#64748b;">{{ l.level }}</span></div>{% endfor %}{% endif %}
+    {% if certs %}<div class="res-section-title">Certifications</div>
+    {% for c in certs %}<div class="cert-row"><div style="font-weight:700;font-size:7.5pt;color:#1e293b;">{{ c.name }}</div><div style="font-size:7pt;color:#64748b;">{{ c.issuer }}{% if c.date %} · {{ c.date }}{% endif %}</div></div>{% endfor %}{% endif %}
+    {% if hobbies %}<div class="res-section-title">Interests</div>
+    {% for h in hobbies %}<div style="font-size:7.5pt;color:#334155;padding:2px 0;">▸ {{ h }}</div>{% endfor %}{% endif %}
+  </div>
+  <div class="res-right">
+    {% if resume.summary %}<div class="res-section-title">Professional Summary</div><p class="res-summary">{{ resume.summary }}</p>{% endif %}
+    {% if exp %}<div class="res-section-title">Professional Experience</div>
+    {% for e in exp %}<div class="res-item">
+      <div class="res-item-header"><span class="res-item-title">{{ e.title }}</span><span class="res-item-date">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</span></div>
+      <div class="res-item-sub">{{ e.company }}</div>
+      {% if e.description %}<div class="res-item-desc">{{ e.description }}</div>{% endif %}
+    </div>{% endfor %}{% endif %}
+    {% if edu %}<div class="res-section-title">Education</div>
+    <table class="edu-table">
+      <thead><tr><th>Qualification</th><th>Stream</th><th>Institution</th><th>Duration</th><th>Grade / %</th></tr></thead>
+      <tbody>{% for e in edu %}<tr>
+        <td><strong>{{ e.degree }}</strong></td>
+        <td>{% if e.stream %}{{ e.stream }}{% elif e.degree == "SSLC" or e.degree == "10th" %}General Education{% else %}{{ e.field|default:"—" }}{% endif %}</td>
+        <td>{{ e.institution }}</td>
+        <td style="white-space:nowrap;">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</td>
+        <td style="text-align:center;font-weight:700;">{% if e.grade %}{{ e.grade }}{% else %}—{% endif %}</td>
+      </tr>{% endfor %}</tbody>
+    </table>{% endif %}
+    {% if projects %}<div class="res-section-title">Key Projects</div>
+    {% for p in projects %}<div class="project-item">
+      <div class="project-title-row"><span class="project-name">{{ p.name }}</span></div>
+      {% if p.tech %}<div class="project-tech">{% for t in p.tech|split_tech %}<span class="project-tech-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+      {% if p.description %}<div class="res-item-desc">{{ p.description }}</div>{% endif %}
+    </div>{% endfor %}{% endif %}
+    {% if achievements %}<div class="res-section-title">Achievements & Awards</div>
+    {% for a in achievements %}<div class="achieve-row"><span class="res-item-title">{{ a.title }}</span><span style="font-size:7.5pt;color:#666;">{{ a.org }}{% if a.year %} · {{ a.year }}{% endif %}</span></div>{% endfor %}{% endif %}
+    {% if resume.full_name %}
+    <div class="declaration-block">
+      <div style="font-weight:700;font-size:7.5pt;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:5px;">Declaration</div>
+      <div>I, {{ resume.full_name }}, hereby declare that the information provided above is true and correct to the best of my knowledge and belief.</div>
+      <div class="decl-sign"><div class="decl-name">{{ resume.full_name }}</div></div>
+    </div>{% endif %}
+  </div>
+</div>
+
+{# ══════════════════════════ CREATIVE ══════════════════════════ #}
+{% else %}
+<div class="res-header">
+  <div class="res-header-inner">
+    <div style="flex:1;">
+      <h1>{{ resume.full_name|default:"Your Name" }}</h1>
+      {% if exp %}<p class="res-role">{{ exp.0.title }}</p>{% endif %}
+      <div class="res-contact">
+        {% if resume.email %}<span>✉ {{ resume.email }}</span>{% endif %}
+        {% if resume.phone %}<span>✆ {{ resume.phone }}</span>{% endif %}
+        {% if resume.location %}<span>⌖ {{ resume.location }}</span>{% endif %}
+        {% if resume.linkedin %}<span>{{ resume.linkedin }}</span>{% endif %}
+        {% if resume.github %}<span>{{ resume.github }}</span>{% endif %}
+      </div>
+    </div>
+    {% if resume.photo %}<img src="{{ resume.photo.url }}" class="res-photo" alt="">
+    {% elif resume.full_name %}<div class="res-photo-initial">{{ resume.full_name|first|upper }}</div>{% endif %}
+  </div>
+</div>
+<div class="res-body">
+  {% if resume.summary %}<div class="res-section-title">About Me</div><p class="res-summary">{{ resume.summary }}</p>{% endif %}
+  {% if exp %}<div class="res-section-title">Experience</div>
+  {% for e in exp %}<div class="res-item">
+    <div class="res-item-header"><span class="res-item-title">{{ e.title }}</span><span class="res-item-date">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</span></div>
+    <div class="res-item-sub">{{ e.company }}</div>
+    {% if e.description %}<div class="res-item-desc">{{ e.description }}</div>{% endif %}
+  </div>{% endfor %}{% endif %}
+  {% if edu %}<div class="res-section-title">Education</div>
+  <table class="edu-table">
+    <thead><tr><th>Qualification</th><th>Stream</th><th>Institution</th><th>Duration</th><th>Grade / %</th></tr></thead>
+    <tbody>{% for e in edu %}<tr>
+      <td><strong>{{ e.degree }}</strong></td>
+      <td>{% if e.stream %}{{ e.stream }}{% elif e.degree == "SSLC" or e.degree == "10th" %}General Education{% else %}{{ e.field|default:"—" }}{% endif %}</td>
+      <td>{{ e.institution }}</td>
+      <td style="white-space:nowrap;">{{ e.start }}{% if e.end %} – {{ e.end }}{% endif %}</td>
+      <td style="text-align:center;font-weight:700;">{% if e.grade %}{{ e.grade }}{% else %}—{% endif %}</td>
+    </tr>{% endfor %}</tbody>
+  </table>{% endif %}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 22px;">
+    <div>
+      {% if projects %}<div class="res-section-title">Projects</div>
+      {% for p in projects %}<div class="project-item">
+        <div class="project-title-row"><span class="project-name">{{ p.name }}</span></div>
+        {% if p.tech %}<div class="project-tech">{% for t in p.tech|split_tech %}<span class="project-tech-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+        {% if p.description %}<div class="res-item-desc">{{ p.description }}</div>{% endif %}
+      </div>{% endfor %}{% endif %}
+      {% if certs %}<div class="res-section-title">Certifications</div>
+      {% for c in certs %}<div class="cert-row"><strong>{{ c.name }}</strong><div style="font-size:7.5pt;color:#555;">{{ c.issuer }}{% if c.date %} · {{ c.date }}{% endif %}</div></div>{% endfor %}{% endif %}
+    </div>
+    <div>
+      {% if skills %}<div class="res-section-title">Skills</div>
+      <div>{% for s in skills %}<span class="skill-pill">{{ s }}</span>{% endfor %}</div>{% endif %}
+      {% if soft %}<div class="res-section-title">Soft Skills</div>
+      <div>{% for s in soft %}<span class="skill-pill" style="background:#f0fdf4;color:#065f46;border-color:#a7f3d0;">{{ s }}</span>{% endfor %}</div>{% endif %}
+      {% if achievements %}<div class="res-section-title">Achievements</div>
+      {% for a in achievements %}<div style="font-size:8pt;margin-bottom:5px;"><strong>{{ a.title }}</strong><span style="font-size:7.5pt;color:#555;"> — {{ a.org }}{% if a.year %} {{ a.year }}{% endif %}</span></div>{% endfor %}{% endif %}
+      {% if langs %}<div class="res-section-title">Languages</div>
+      {% for l in langs %}<div class="res-lang-row"><span>{{ l.name }}</span><span style="font-size:7.5pt;color:#555;">{{ l.level }}</span></div>{% endfor %}{% endif %}
+      {% if hobbies %}<div class="res-section-title">Hobbies</div>
+      <div style="font-size:8pt;color:#374151;">{{ hobbies|join:" · " }}</div>{% endif %}
+    </div>
+  </div>
+  {% if resume.full_name %}
+  <div class="declaration-block">
+    <div style="font-weight:700;font-size:7.5pt;text-transform:uppercase;letter-spacing:.1em;color:#064e3b;margin-bottom:5px;">Declaration</div>
+    <div>I, {{ resume.full_name }}, hereby declare that the information provided above is true and correct to the best of my knowledge and belief.</div>
+    <div class="decl-sign"><div class="decl-name">{{ resume.full_name }}</div></div>
+  </div>{% endif %}
+</div>
+{% endif %}
+
+</div>
+{% endwith %}

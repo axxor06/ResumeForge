@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block title %}ResumeForge — Build ATS-Friendly Resumes That Get You Hired{% endblock %}
+{% block extra_head %}
+<style>
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:88px 2rem 60px;position:relative;overflow:hidden;background:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 50%,#f0fdf4 100%);}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.5;pointer-events:none;}
+.hero-blob-1{width:500px;height:500px;background:rgba(34,197,94,0.18);top:-100px;right:-100px;}
+.hero-blob-2{width:300px;height:300px;background:rgba(22,163,74,0.12);bottom:-50px;left:10%;}
+.hero-content{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1;}
+.hero-badge{display:inline-flex;align-items:center;gap:0.5rem;background:var(--green-soft);color:var(--green);border:1px solid #86efac;padding:0.35rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;margin-bottom:1.2rem;}
+.hero h1{font-family:'Playfair Display',serif;font-size:3.2rem;line-height:1.15;color:var(--green-dark);margin-bottom:1.2rem;}
+.hero h1 em{color:var(--green);font-style:normal;}
+.hero p{font-size:1.05rem;color:var(--gray);line-height:1.7;margin-bottom:2rem;max-width:480px;}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;}
+.hero-stats{display:flex;gap:2rem;margin-top:2.5rem;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat strong{display:block;font-size:1.5rem;font-weight:700;color:var(--green-dark);}
+.hero-stat span{font-size:0.8rem;color:var(--gray);}
+/* Resume mockup */
+.hero-visual{display:flex;justify-content:center;align-items:center;position:relative;}
+.resume-card-float{background:white;border-radius:16px;box-shadow:0 20px 60px rgba(22,163,74,0.15),0 4px 16px rgba(0,0,0,0.08);padding:20px;width:300px;animation:floatUp 4s ease-in-out infinite;}
+@keyframes floatUp{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.rcf-header{background:linear-gradient(135deg,#14532d,#16a34a);border-radius:10px;padding:14px 16px;color:white;margin-bottom:12px;}
+.rcf-header h3{font-size:1rem;font-weight:700;margin-bottom:2px;}
+.rcf-header p{font-size:0.72rem;opacity:0.85;}
+.rcf-line{height:7px;background:#e2e8f0;border-radius:4px;margin:6px 0;}
+.rcf-line.green{background:#bbf7d0;width:70%;}
+.rcf-line.w50{width:50%;}
+.rcf-line.w80{width:80%;}
+.rcf-section{margin-bottom:10px;}
+.rcf-section-title{font-size:0.65rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.badge-float{position:absolute;background:white;border-radius:12px;padding:8px 14px;box-shadow:0 8px 24px rgba(0,0,0,0.1);font-size:0.8rem;font-weight:600;display:flex;align-items:center;gap:6px;}
+.badge-float.ats{top:10%;right:-20px;color:var(--green);}
+.badge-float.saved{bottom:15%;left:-20px;color:#2563eb;}
+
+/* FEATURES */
+.features-section{padding:6rem 2rem;background:white;}
+.section-intro{text-align:center;max-width:600px;margin:0 auto 4rem;}
+.section-intro h2{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--green-dark);margin-bottom:0.8rem;}
+.section-intro p{color:var(--gray);font-size:1rem;line-height:1.7;}
+.features-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;}
+.feature-card{background:var(--off-white);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;transition:transform 0.2s,box-shadow 0.2s;}
+.feature-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+.feature-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--green),var(--green-light));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;margin-bottom:1.2rem;}
+.feature-card h3{font-size:1.05rem;font-weight:700;color:var(--green-dark);margin-bottom:0.6rem;}
+.feature-card p{color:var(--gray);font-size:0.88rem;line-height:1.6;}
+
+/* TEMPLATES showcase */
+.templates-section{padding:6rem 2rem;background:var(--off-white);}
+.templates-grid{max-width:1100px;margin:2.5rem auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.5rem;}
+.tpl-card{background:white;border-radius:var(--radius);overflow:hidden;border:2px solid var(--border);transition:all 0.2s;cursor:pointer;}
+.tpl-card:hover{border-color:var(--green);transform:translateY(-4px);box-shadow:var(--shadow-md);}
+.tpl-thumb{height:180px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;}
+.tpl-modern-thumb{background:linear-gradient(135deg,#14532d,#16a34a);color:rgba(255,255,255,0.9);}
+.tpl-minimal-thumb{background:white;border-bottom:2px solid #1a1a1a;color:#1a1a1a;}
+.tpl-corporate-thumb{background:#1e293b;color:rgba(255,255,255,0.85);}
+.tpl-creative-thumb{background:linear-gradient(135deg,#065f46,#059669);color:rgba(255,255,255,0.9);}
+.tpl-thumb-inner{text-align:center;padding:16px;}
+.tpl-thumb-inner h4{font-size:0.85rem;margin-bottom:4px;}
+.tpl-thumb-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.3);margin:3px 0;width:80%;}
+.tpl-thumb-bar.w60{width:60%;}
+.tpl-card-info{padding:1rem;}
+.tpl-card-info h3{font-weight:700;font-size:0.92rem;color:var(--text);margin-bottom:0.2rem;}
+.tpl-card-info p{font-size:0.78rem;color:var(--gray);}
+.tpl-badge-ats{display:inline-block;background:var(--green-soft);color:var(--green);font-size:0.7rem;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:0.3rem;}
+
+/* STATS */
+.stats-section{padding:5rem 2rem;background:linear-gradient(135deg,#14532d,#16a34a);color:white;}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2rem;text-align:center;}
+.stat-number{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;margin-bottom:0.3rem;}
+.stat-label{font-size:0.88rem;opacity:0.85;}
+
+/* HOW IT WORKS */
+.how-section{padding:6rem 2rem;background:white;}
+.steps-list{max-width:800px;margin:3rem auto 0;display:flex;flex-direction:column;gap:2rem;}
+.step-row{display:flex;gap:1.5rem;align-items:flex-start;}
+.step-circle{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;font-size:1.1rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px var(--green-glow);}
+.step-row h3{font-size:1rem;font-weight:700;color:var(--green-dark);margin-bottom:0.3rem;}
+.step-row p{color:var(--gray);font-size:0.88rem;line-height:1.6;}
+
+/* TESTIMONIALS */
+.testimonials-section{padding:6rem 2rem;background:var(--off-white);}
+.testimonials-grid{max-width:1100px;margin:3rem auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.testimonial-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:1.8rem;}
+.stars{color:#f59e0b;margin-bottom:0.8rem;font-size:0.9rem;}
+.testimonial-text{font-size:0.9rem;color:var(--text);line-height:1.6;margin-bottom:1.2rem;}
+.testimonial-author{display:flex;align-items:center;gap:0.8rem;}
+.author-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;}
+.author-info strong{display:block;font-size:0.85rem;font-weight:700;color:var(--text);}
+.author-info span{font-size:0.75rem;color:var(--gray);}
+
+/* FAQ */
+.faq-section{padding:6rem 2rem;background:white;}
+.faq-list{max-width:720px;margin:3rem auto 0;}
+.faq-item{border-bottom:1px solid var(--border);padding:1.2rem 0;}
+.faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--text);}
+.faq-q:hover{color:var(--green);}
+.faq-a{display:none;padding-top:0.8rem;color:var(--gray);font-size:0.88rem;line-height:1.6;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-q{color:var(--green);}
+
+/* CTA */
+.cta-section{padding:6rem 2rem;background:linear-gradient(135deg,#f0fdf4,#dcfce7);text-align:center;}
+.cta-card{max-width:600px;margin:0 auto;background:linear-gradient(135deg,#14532d,#16a34a);border-radius:24px;padding:4rem 3rem;color:white;box-shadow:0 20px 60px rgba(22,163,74,0.25);}
+.cta-card h2{font-family:'Playfair Display',serif;font-size:2.2rem;margin-bottom:1rem;}
+.cta-card p{font-size:1rem;opacity:0.9;margin-bottom:2rem;}
+.cta-card .btn-white{background:white;color:var(--green);padding:0.9rem 2.5rem;border-radius:50px;font-weight:700;font-size:1rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.6rem;transition:transform 0.2s,box-shadow 0.2s;}
+.cta-card .btn-white:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.2);}
+
+/* FOOTER */
+footer{background:#0f1e12;color:rgba(255,255,255,0.7);padding:3rem 2rem 2rem;}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;}
+.footer-brand .logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:white;margin-bottom:0.8rem;}
+.footer-brand .logo em{color:var(--green-light);font-style:normal;}
+.footer-brand p{font-size:0.84rem;line-height:1.6;}
+footer h4{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:white;margin-bottom:1rem;}
+footer ul{list-style:none;}
+footer ul li{margin-bottom:0.5rem;}
+footer ul li a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.84rem;transition:color 0.2s;}
+footer ul li a:hover{color:var(--green-light);}
+.footer-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-bottom p{font-size:0.8rem;}
+@media(max-width:900px){.hero-content{grid-template-columns:1fr;text-align:center;gap:3rem;}.hero-visual{order:-1;}.hero h1{font-size:2.2rem;}.hero p{max-width:100%;}.hero-ctas{justify-content:center;}.hero-stats{justify-content:center;}.footer-inner{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.hero h1{font-size:1.9rem;}.footer-inner{grid-template-columns:1fr;}.badge-float{display:none;}}
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge"><i class="fa-solid fa-circle-check"></i> 100% Free — No Credit Card Required</div>
+      <h1>Build a Resume That <em>Gets You Hired</em></h1>
+      <p>Create ATS-optimised, professional resumes in minutes. 4 stunning templates, real-time preview, PDF export — and your data is saved forever.</p>
+      <div class="hero-ctas">
+        {% if user.is_authenticated %}
+          <a href="{% url 'create_resume' %}" class="btn btn-primary" style="font-size:1rem;padding:0.85rem 2rem;"><i class="fa-solid fa-plus"></i> Create New Resume</a>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline" style="font-size:1rem;padding:0.85rem 2rem;">My Dashboard</a>
+        {% else %}
+          <a href="{% url 'register' %}" class="btn btn-primary" style="font-size:1rem;padding:0.85rem 2rem;"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
+          <a href="{% url 'login' %}" class="btn btn-outline" style="font-size:1rem;padding:0.85rem 2rem;">Sign In</a>
+        {% endif %}
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>10,000+</strong><span>Resumes Created</span></div>
+        <div class="hero-stat"><strong>4</strong><span>Pro Templates</span></div>
+        <div class="hero-stat"><strong>100%</strong><span>ATS Friendly</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="resume-card-float">
+        <div class="rcf-header"><h3>Arjun Krishnan PS</h3><p>Software Engineer · Palakkad, Kerala</p></div>
+        <div class="rcf-section"><div class="rcf-section-title">Experience</div><div class="rcf-line green"></div><div class="rcf-line w50"></div><div class="rcf-line w80"></div></div>
+        <div class="rcf-section"><div class="rcf-section-title">Skills</div><div class="rcf-line green w50"></div><div class="rcf-line w80"></div></div>
+        <div class="rcf-section"><div class="rcf-section-title">Education</div><div class="rcf-line green"></div><div class="rcf-line w50"></div></div>
+      </div>
+      <div class="badge-float ats"><i class="fa-solid fa-shield-check" style="color:var(--green);"></i> ATS Score: 98%</div>
+      <div class="badge-float saved"><i class="fa-solid fa-cloud-arrow-up" style="color:#2563eb;"></i> Auto-saved</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-intro">
+    <h2>Everything You Need to Land the Job</h2>
+    <p>A complete resume building platform with professional tools — completely free, no limits.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><h3>4 Professional Templates</h3><p>Modern, Minimal, Corporate, and Creative — all ATS-friendly and designed by professionals.</p></div>
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-bolt"></i></div><h3>Real-time Live Preview</h3><p>See your resume update instantly as you type. No more guessing how it will look.</p></div>
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-cloud"></i></div><h3>Cloud Sync & Auto-save</h3><p>Your resumes are saved to the cloud automatically. Access from any device, any time.</p></div>
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-file-pdf"></i></div><h3>High-quality PDF Export</h3><p>Download crisp, professional PDFs optimised for A4. Print-ready and recruiter-approved.</p></div>
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-copy"></i></div><h3>Multiple Resumes</h3><p>Create different resumes tailored to different jobs. Duplicate and tweak in seconds.</p></div>
+    <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div><h3>Secure Authentication</h3><p>Email verification, OTP flows, and Google Sign-In keep your data safe and private.</p></div>
+  </div>
+</section>
+
+<!-- TEMPLATES -->
+<section class="templates-section" id="templates">
+  <div class="section-intro">
+    <h2>Choose Your Template</h2>
+    <p>All templates are ATS-optimised, professionally designed, and instantly customisable.</p>
+  </div>
+  <div class="templates-grid">
+    <div class="tpl-card"><div class="tpl-thumb tpl-modern-thumb"><div class="tpl-thumb-inner"><h4>Modern Pro</h4><div class="tpl-thumb-bar"></div><div class="tpl-thumb-bar w60"></div><div class="tpl-thumb-bar"></div></div></div><div class="tpl-card-info"><h3>Modern Professional</h3><p>Clean sidebar layout with green accents</p><span class="tpl-badge-ats">ATS Ready</span></div></div>
+    <div class="tpl-card"><div class="tpl-thumb tpl-minimal-thumb"><div class="tpl-thumb-inner" style="color:#1a1a1a;"><h4>Minimal</h4><div class="tpl-thumb-bar" style="background:#1a1a1a;"></div><div class="tpl-thumb-bar w60" style="background:#e5e7eb;"></div><div class="tpl-thumb-bar" style="background:#e5e7eb;"></div></div></div><div class="tpl-card-info"><h3>Minimal Clean</h3><p>Timeless black & white, for any industry</p><span class="tpl-badge-ats">ATS Ready</span></div></div>
+    <div class="tpl-card"><div class="tpl-thumb tpl-corporate-thumb"><div class="tpl-thumb-inner"><h4>Corporate</h4><div class="tpl-thumb-bar"></div><div class="tpl-thumb-bar w60"></div><div class="tpl-thumb-bar"></div></div></div><div class="tpl-card-info"><h3>Corporate Classic</h3><p>Bold header, structured, executive look</p><span class="tpl-badge-ats">ATS Ready</span></div></div>
+    <div class="tpl-card"><div class="tpl-thumb tpl-creative-thumb"><div class="tpl-thumb-inner"><h4>Creative</h4><div class="tpl-thumb-bar"></div><div class="tpl-thumb-bar w60"></div><div class="tpl-thumb-bar"></div></div></div><div class="tpl-card-info"><h3>Creative Bold</h3><p>Stand out with emerald gradient design</p><span class="tpl-badge-ats">ATS Ready</span></div></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-inner">
+    <div><div class="stat-number">10K+</div><div class="stat-label">Resumes Built</div></div>
+    <div><div class="stat-number">98%</div><div class="stat-label">ATS Pass Rate</div></div>
+    <div><div class="stat-number">4</div><div class="stat-label">Pro Templates</div></div>
+    <div><div class="stat-number">100%</div><div class="stat-label">Free to Use</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-intro">
+    <h2>Create Your Resume in 3 Steps</h2>
+    <p>No design skills needed. Just fill in your details and download.</p>
+  </div>
+  <div class="steps-list">
+    <div class="step-row"><div class="step-circle">1</div><div><h3>Sign Up & Choose a Template</h3><p>Create a free account in seconds. Pick from 4 professionally designed, ATS-optimised resume templates.</p></div></div>
+    <div class="step-row"><div class="step-circle">2</div><div><h3>Fill in Your Details</h3><p>Use the guided multi-step form to add your experience, education, skills, projects, and more. Auto-saves as you type.</p></div></div>
+    <div class="step-row"><div class="step-circle">3</div><div><h3>Preview & Download</h3><p>See a live preview, switch templates instantly, and download a crisp A4 PDF ready to send to employers.</p></div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="section-intro">
+    <h2>Loved by Job Seekers</h2>
+    <p>Thousands have used ResumeForge to land their dream jobs.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"I got a callback from Infosys within a week of using ResumeForge. The ATS-friendly templates made all the difference!"</p><div class="testimonial-author"><div class="author-avatar">R</div><div class="author-info"><strong>Rahul Menon</strong><span>Software Engineer, Kochi</span></div></div></div>
+    <div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"Super easy to use. I built my entire resume in under 30 minutes. The live preview is brilliant — you see exactly what recruiters will see."</p><div class="testimonial-author"><div class="author-avatar">P</div><div class="author-info"><strong>Priya Sharma</strong><span>Marketing Graduate, Bangalore</span></div></div></div>
+    <div class="testimonial-card"><div class="stars">★★★★★</div><p class="testimonial-text">"Finally a free resume builder that doesn't add watermarks or lock features. Clean, professional, and genuinely free. Love it."</p><div class="testimonial-author"><div class="author-avatar">A</div><div class="author-info"><strong>Arjun Nair</strong><span>Final Year Student, Palakkad</span></div></div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-intro">
+    <h2>Frequently Asked Questions</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Is ResumeForge completely free? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Yes! ResumeForge is 100% free. No hidden fees, no credit card, no watermarks. All templates and features are available to all users.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Are the templates ATS-friendly? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Absolutely. All 4 templates are designed to pass Applicant Tracking Systems used by companies like TCS, Infosys, Wipro, and global firms. Clean formatting and proper section headings ensure your resume is machine-readable.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Can I create multiple resumes? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Yes. You can create as many resumes as you want — tailored for different jobs, industries, or roles. Duplicate a resume and tweak it in seconds.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How do I download my resume as PDF? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Click the "Download PDF" button from the builder or preview page. Use your browser's built-in "Save as PDF" to get a crisp A4 PDF. No third-party tools needed.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Is my data safe? <i class="fa-solid fa-chevron-down"></i></div><div class="faq-a">Your data is stored securely using Django's best practices with CSRF protection, hashed passwords, and email verification. We never share your data.</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-card">
+    <h2>Ready to Land Your Dream Job?</h2>
+    <p>Join thousands of job seekers who built winning resumes with ResumeForge — for free.</p>
+    {% if user.is_authenticated %}
+      <a href="{% url 'create_resume' %}" class="btn-white"><i class="fa-solid fa-plus"></i> Create New Resume</a>
+    {% else %}
+      <a href="{% url 'register' %}" class="btn-white"><i class="fa-solid fa-rocket"></i> Start Building Free</a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">Resume<em>Forge</em></div>
+      <p>Build professional, ATS-friendly resumes that get you hired. Free, fast, and beautiful.</p>
+    </div>
+    <div>
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#templates">Templates</a></li>
+        <li><a href="{% url 'register' %}">Get Started</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Account</h4>
+      <ul>
+        <li><a href="{% url 'login' %}">Sign In</a></li>
+        <li><a href="{% url 'register' %}">Register</a></li>
+        {% if user.is_authenticated %}<li><a href="{% url 'dashboard' %}">Dashboard</a></li>{% endif %}
+      </ul>
+    </div>
+    <div>
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 ResumeForge. Built with Django.</p>
+    <p>Made with <span style="color:#22c55e;">♥</span> in Kerala, India</p>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(el){
+  const item=el.parentNode;
+  item.classList.toggle('open');
+  const icon=el.querySelector('i');
+  icon.style.transform=item.classList.contains('open')?'rotate(180deg)':'rotate(0)';
+}
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}});
+},{threshold:0.1});
+document.querySelectorAll('.feature-card,.tpl-card,.testimonial-card,.step-row').forEach(el=>{
+  el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';
+  obs.observe(el);
+});
+</script>
+{% endblock %}

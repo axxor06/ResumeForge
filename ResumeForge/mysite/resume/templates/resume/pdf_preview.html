@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>{{ resume.full_name|default:resume.title }} — Resume</title>
+{% load static %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+{% include "resume/partials/resume_css.html" %}
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#e5e7eb;font-family:'Inter',sans-serif;}
+/* Controls bar — hidden in pdf_mode and print */
+.pdf-controls{
+  position:sticky;top:0;z-index:999;background:white;
+  border-bottom:1.5px solid #e5e7eb;padding:10px 20px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.07);
+}
+.pdf-controls .logo{font-weight:800;font-size:1rem;color:#16a34a;margin-right:auto;}
+.pdf-controls .logo em{font-style:normal;color:#111;}
+.btn-dl{
+  background:#16a34a;color:white;border:none;padding:9px 22px;
+  border-radius:50px;font-size:.85rem;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+}
+.btn-dl:hover{background:#15803d;}
+.btn-back{
+  background:white;color:#374151;border:1.5px solid #d1d5db;
+  padding:8px 18px;border-radius:50px;font-size:.85rem;font-weight:600;
+  cursor:pointer;text-decoration:none;
+}
+.btn-back:hover{border-color:#16a34a;color:#16a34a;}
+.hint{font-size:.75rem;color:#9ca3af;}
+.page-wrap{display:flex;justify-content:center;padding:28px 16px 50px;}
+/* Print / PDF mode */
+@media print{
+  html,body{background:white!important;}
+  .pdf-controls{display:none!important;}
+  .page-wrap{padding:0!important;}
+  .resume-doc{box-shadow:none!important;border:1.5px solid #ccc!important;margin:0!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+}
+</style>
+</head>
+<body>
+{% if not pdf_mode %}
+<div class="pdf-controls">
+  <span class="logo">Resume<em>Forge</em></span>
+  <a href="{% url 'download_pdf' resume.pk %}" class="btn-dl">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download PDF
+  </a>
+  <a href="javascript:history.back()" class="btn-back">← Back</a>
+  <span class="hint">or Ctrl+P → Save as PDF</span>
+</div>
+{% endif %}
+<div class="page-wrap">
+  {% include "resume/partials/resume_body.html" with resume=resume %}
+</div>
+</body>
+</html>

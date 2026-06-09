@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ResumeForge{% endblock %}
+{% block extra_head %}
+<style>
+.dash-page{min-height:100vh;padding:88px 2rem 4rem;max-width:1200px;margin:0 auto;}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem;}
+.dash-title h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--green-dark);}
+.dash-title p{color:var(--gray);font-size:0.92rem;margin-top:0.3rem;}
+.search-bar{display:flex;gap:0.7rem;align-items:center;flex-wrap:wrap;}
+.search-bar input{padding:0.6rem 1rem;border:1.5px solid var(--border);border-radius:50px;font-family:inherit;font-size:0.88rem;background:white;width:220px;outline:none;transition:border-color 0.2s;}
+.search-bar input:focus{border-color:var(--green);}
+.search-bar button{padding:0.6rem 1rem;border:none;border-radius:50px;background:var(--green);color:white;cursor:pointer;font-size:0.88rem;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2.5rem;}
+.stat-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1rem;}
+.stat-icon{width:44px;height:44px;border-radius:12px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:1.1rem;flex-shrink:0;}
+.stat-card h3{font-size:1.6rem;font-weight:700;color:var(--green-dark);}
+.stat-card p{font-size:0.78rem;color:var(--gray);}
+.resume-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
+.resume-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+.resume-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+.card-preview{height:160px;background:linear-gradient(135deg,var(--green-soft),#fff);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.card-preview .preview-mockup{width:80px;background:white;border-radius:4px;padding:6px 8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);}
+.card-preview .preview-mockup .pm-line{height:3px;border-radius:2px;background:var(--green);margin-bottom:3px;}
+.card-preview .preview-mockup .pm-line.short{width:60%;background:#e2e8f0;}
+.card-preview .preview-mockup .pm-line.med{width:80%;background:#e2e8f0;}
+.template-badge{position:absolute;top:10px;right:10px;background:rgba(22,163,74,0.12);border:1px solid rgba(22,163,74,0.25);color:var(--green);font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:capitalize;}
+.card-body{padding:1.2rem;}
+.card-body h3{font-weight:600;font-size:1rem;color:var(--text);margin-bottom:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-body .card-name{font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;}
+.card-meta{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--gray);margin-bottom:1rem;}
+.card-actions{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.card-actions a,.card-actions button{padding:0.35rem 0.8rem;border-radius:50px;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;transition:all 0.15s;}
+.ca-edit{background:var(--green);color:white;}
+.ca-edit:hover{background:var(--green-dark);}
+.ca-preview{background:var(--green-soft);color:var(--green);}
+.ca-preview:hover{background:var(--green);color:white;}
+.ca-dup{background:#f1f5f9;color:#475569;}
+.ca-dup:hover{background:#e2e8f0;}
+.ca-del{background:#fef2f2;color:#ef4444;}
+.ca-del:hover{background:#fee2e2;}
+.empty-state{text-align:center;padding:5rem 2rem;grid-column:1/-1;}
+.empty-state .empty-icon{font-size:4rem;color:var(--green-soft);margin-bottom:1.5rem;}
+.empty-state h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--green-dark);margin-bottom:0.7rem;}
+.empty-state p{color:var(--gray);margin-bottom:2rem;}
+@media(max-width:600px){.dash-header{flex-direction:column;}.dash-title h1{font-size:1.5rem;}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="dash-page">
+  <div class="dash-header">
+    <div class="dash-title">
+      <h1>My Resumes</h1>
+      <p>Welcome back, {{ user.first_name }}! Build and manage your resumes below.</p>
+    </div>
+    <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+      <form class="search-bar" method="get">
+        <input type="text" name="q" placeholder="Search resumes..." value="{{ search_query }}">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+      <a href="{% url 'create_resume' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Resume</a>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fa-solid fa-file-lines"></i></div>
+      <div><h3>{{ resumes.count }}</h3><p>Total Resumes</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+      <div><h3>{{ user.date_joined|date:"M Y" }}</h3><p>Member Since</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+      <div><h3>Free</h3><p>Current Plan</p></div>
+    </div>
+  </div>
+
+  <div class="resume-grid">
+    {% for r in resumes %}
+    <div class="resume-card">
+      <div class="card-preview">
+        <div class="preview-mockup">
+          <div class="pm-line"></div><div class="pm-line short"></div>
+          <div style="height:6px;"></div>
+          <div class="pm-line med"></div><div class="pm-line short"></div><div class="pm-line med"></div>
+          <div style="height:6px;"></div>
+          <div class="pm-line short"></div><div class="pm-line med"></div>
+        </div>
+        <span class="template-badge">{{ r.get_template_display }}</span>
+      </div>
+      <div class="card-body">
+        <h3>{{ r.title }}</h3>
+        <div class="card-name">{% if r.full_name %}{{ r.full_name }}{% else %}<em style="color:#ccc;">No name set</em>{% endif %}</div>
+        <div class="card-meta">
+          <span><i class="fa-regular fa-clock"></i> {{ r.updated_at|date:"d M Y" }}</span>
+          <span><i class="fa-regular fa-calendar"></i> Created {{ r.created_at|date:"d M" }}</span>
+        </div>
+        <div class="card-actions">
+          <a href="{% url 'build_resume' r.pk %}" class="ca-edit"><i class="fa-solid fa-pen"></i> Edit</a>
+          <a href="{% url 'preview_resume' r.pk %}" class="ca-preview" target="_blank"><i class="fa-solid fa-eye"></i> Preview</a>
+          <form method="post" action="{% url 'duplicate_resume' r.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="ca-dup"><i class="fa-solid fa-copy"></i> Dup</button></form>
+          <form method="post" action="{% url 'delete_resume' r.pk %}" style="display:inline;" onsubmit="return confirm('Delete this resume?');">{% csrf_token %}<button type="submit" class="ca-del"><i class="fa-solid fa-trash"></i></button></form>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <div class="empty-icon"><i class="fa-regular fa-file-lines"></i></div>
+      <h2>No resumes yet</h2>
+      <p>Create your first resume and land your dream job!</p>
+      <a href="{% url 'create_resume' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create My First Resume</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

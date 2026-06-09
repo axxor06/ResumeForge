@@ -1,0 +1,26 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Verify Email — ResumeForge{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="icon-wrap"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <h1>Check Your Email</h1>
+      <p>We sent a 6-digit code to<br><strong>{{ email }}</strong></p>
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" style="text-align:center;display:block;">Enter Verification Code</label>
+        {{ form.otp }}
+        {% if form.otp.errors %}<div class="field-error" style="justify-content:center;">{{ form.otp.errors.0 }}</div>{% endif %}
+      </div>
+      <p class="otp-hint">Code expires in 10 minutes</p>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:1.2rem;">Verify Email <i class="fa-solid fa-check"></i></button>
+    </form>
+    <div class="auth-footer" style="margin-top:1rem;">
+      Didn't get it? <a href="{% url 'resend_otp' %}">Resend code</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
